@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" id="htmlRoot">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
+<meta name="googlebot" content="noindex,nofollow">
+<title>Global Economic Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fafafa;
+  --surface:#ffffff;
+  --surface-2:#f5f5f7;
+  --border:#ececef;
+  --border-strong:#e0e0e4;
+  --text:#0a0a0a;
+  --text-2:#525258;
+  --muted:#8a8a93;
+  --accent:#0a0a0a;
+  --accent-soft:#f0f0f3;
+  --blue:#2563eb;
+  --blue-soft:#eff4ff;
+  --green:#059669;
+  --green-soft:#ecfdf5;
+  --amber:#b45309;
+  --amber-soft:#fffbeb;
+  --red:#dc2626;
+  --red-soft:#fef2f2;
+  --radius:10px;
+  --radius-sm:6px;
+  --radius-lg:14px;
+  --shadow-sm:0 1px 2px rgba(16,24,40,.04);
+  --shadow:0 1px 3px rgba(16,24,40,.05),0 1px 2px rgba(16,24,40,.03);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{
+  height:100%;overflow:hidden;
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  background:var(--bg);color:var(--text);
+  font-feature-settings:'cv02','cv03','cv04','cv11';
+  -webkit-font-smoothing:antialiased;
+}
+html[dir="rtl"] body{
+  font-family:'IBM Plex Sans Arabic','Inter',system-ui,sans-serif;
+}
+.page{display:flex;flex-direction:column;height:100%;}
+.top{
+  flex-shrink:0;background:var(--surface);
+  border-bottom:1px solid var(--border);
+}
+.hdr{
+  padding:18px 28px 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;flex-wrap:wrap;
+}
+h1{
+  font-size:1.15rem;font-weight:600;letter-spacing:-.015em;
+  display:flex;align-items:center;gap:10px;
+  color:var(--text);
+}
+h1 .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px var(--green-soft);}
+.badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.badge{
+  font-size:.70rem;font-weight:500;
+  padding:4px 10px;border-radius:999px;
+  border:1px solid var(--border);color:var(--text-2);
+  background:var(--surface);
+  display:inline-flex;align-items:center;gap:5px;
+}
+.badge.live{color:var(--green);border-color:#bbf7d0;background:var(--green-soft);}
+.sources{
+  padding:0 28px 14px;
+  display:flex;gap:6px;flex-wrap:wrap;align-items:center;
+  font-size:.68rem;color:var(--muted);
+}
+.sources .lbl{font-weight:600;color:var(--text-2);margin-inline-end:4px;}
+.src{
+  padding:3px 9px;border-radius:var(--radius-sm);
+  background:var(--surface-2);color:var(--text-2);
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:.66rem;
+}
+.toolbar{
+  padding:12px 28px;border-top:1px solid var(--border);
+  display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+  background:var(--surface);
+}
+.search{position:relative;flex:1;min-width:200px;max-width:360px;}
+.search input{
+  width:100%;background:var(--surface-2);
+  border:1px solid transparent;
+  border-radius:var(--radius);
+  padding-block:8px;padding-inline-start:36px;padding-inline-end:12px;
+  color:var(--text);font-size:.85rem;font-family:inherit;
+  outline:none;transition:all .15s;
+}
+.search input::placeholder{color:var(--muted);}
+.search input:focus{background:var(--surface);border-color:var(--border-strong);box-shadow:0 0 0 3px var(--accent-soft);}
+.search .icon{
+  position:absolute;inset-inline-start:12px;top:50%;
+  transform:translateY(-50%);
+  color:var(--muted);font-size:.9rem;pointer-events:none;
+}
+.count{
+  font-size:.75rem;color:var(--text-2);
+  padding:6px 12px;border-radius:var(--radius);
+  background:var(--surface-2);
+}
+.count b{color:var(--text);font-weight:600;}
+.legend{display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+.lg{display:flex;align-items:center;gap:5px;font-size:.7rem;color:var(--text-2);}
+.lg .d{width:6px;height:6px;border-radius:50%;}
+.spacer{flex:1;}
+.toggles{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.seg{
+  display:inline-flex;
+  background:var(--surface-2);
+  border-radius:var(--radius);
+  padding:3px;
+  gap:2px;
+}
+.seg button{
+  border:none;background:transparent;
+  padding:5px 12px;border-radius:var(--radius-sm);
+  font-size:.73rem;font-weight:500;color:var(--text-2);
+  cursor:pointer;transition:all .15s;font-family:inherit;
+  min-width:36px;
+}
+.seg button:hover{color:var(--text);}
+.seg button.active{
+  background:var(--surface);color:var(--text);
+  box-shadow:var(--shadow-sm);font-weight:600;
+}
+.btn-ghost{
+  border:1px solid var(--border);background:var(--surface);
+  padding:6px 12px;border-radius:var(--radius);
+  font-size:.73rem;color:var(--text-2);font-weight:500;
+  cursor:pointer;transition:all .15s;font-family:inherit;
+  display:inline-flex;align-items:center;gap:5px;
+}
+.btn-ghost:hover{background:var(--surface-2);color:var(--text);}
+.scroll{flex:1;overflow:auto;}
+.tw{padding:0 0 32px;}
+table{
+  width:100%;border-collapse:separate;border-spacing:0;
+  min-width:1200px;font-size:.82rem;
+}
+thead th{
+  background:var(--surface);color:var(--muted);
+  font-weight:600;font-size:.65rem;
+  text-transform:uppercase;letter-spacing:.05em;
+  padding:12px 14px;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;user-select:none;white-space:nowrap;
+  position:sticky;top:0;z-index:5;transition:color .15s;
+  text-align:start;
+}
+thead th:hover{color:var(--text);}
+thead th.sa::after{content:' ↑';color:var(--text);opacity:.8;}
+thead th.sd::after{content:' ↓';color:var(--text);opacity:.8;}
+thead th small{
+  display:block;font-size:.62rem;color:var(--muted);
+  font-weight:400;text-transform:none;letter-spacing:0;
+  margin-top:3px;
+}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s;}
+tbody tr:hover{background:var(--surface-2);}
+tbody td{
+  padding:11px 14px;vertical-align:middle;
+  border-bottom:1px solid var(--border);
+  color:var(--text);
+}
+.cc{min-width:180px;}
+.fl{font-size:1.1rem;margin-inline-end:2px;}
+.cn{font-weight:600;font-size:.85rem;color:var(--text);}
+.ci{color:var(--muted);font-size:.65rem;margin-top:2px;}
+.na{color:#c6c6cc;font-size:.74rem;}
+.v{font-weight:500;color:var(--text);}
+.rk{
+  display:inline-block;padding:2px 7px;border-radius:999px;
+  font-size:.6rem;font-weight:600;
+  margin-inline-start:6px;
+  letter-spacing:.02em;
+}
+.rk.t{background:var(--green-soft);color:var(--green);}
+.rk.m{background:var(--amber-soft);color:var(--amber);}
+.rk.b{background:var(--red-soft);color:var(--red);}
+.mc{cursor:help;}
+.hidden{display:none!important;}
+.tip-box{
+  display:none;position:fixed;z-index:9999;
+  background:var(--surface);color:var(--text);
+  border:1px solid var(--border-strong);
+  border-radius:var(--radius-lg);
+  padding:14px 16px;
+  font-size:.74rem;line-height:1.6;
+  box-shadow:0 10px 38px rgba(16,24,40,.12),0 4px 12px rgba(16,24,40,.06);
+  max-width:320px;pointer-events:auto;
+}
+.tip-title{font-weight:600;font-size:.82rem;color:var(--text);margin-bottom:6px;}
+.tip-yr{color:var(--muted);font-size:.68rem;margin-bottom:8px;}
+.tip-org{color:var(--text-2);font-size:.72rem;margin-top:4px;}
+.tip-org b{color:var(--muted);font-weight:600;font-size:.63rem;text-transform:uppercase;letter-spacing:.04em;}
+.tip-org a{color:var(--blue);text-decoration:none;font-weight:500;}
+.tip-org a:hover{text-decoration:underline;}
+.tip-click{color:var(--muted);font-size:.64rem;margin-top:6px;opacity:.8;}
+.tip-note{
+  color:var(--text-2);margin-top:8px;font-size:.68rem;
+  font-style:normal;line-height:1.55;
+  border-top:1px solid var(--border);padding-top:8px;
+}
+footer{
+  padding:14px 28px;color:var(--muted);font-size:.68rem;
+  border-top:1px solid var(--border);background:var(--surface);
+  text-align:center;line-height:1.6;
+}
+footer a{color:var(--text-2);text-decoration:none;font-weight:500;}
+footer a:hover{color:var(--text);text-decoration:underline;}
+.notif{
+  position:fixed;bottom:20px;inset-inline-end:20px;
+  background:var(--surface);border:1px solid var(--border-strong);
+  border-radius:var(--radius);
+  padding:10px 16px;font-size:.78rem;color:var(--text);
+  z-index:200;max-width:300px;
+  box-shadow:0 10px 30px rgba(16,24,40,.10);
+  display:none;
+}
+/* RTL number alignment: keep numeric cells LTR so numbers read correctly */
+td.mc .v{unicode-bidi:plaintext;}
+/* ── password gate ── */
+.gate{
+  position:fixed;inset:0;z-index:99999;
+  background:linear-gradient(180deg,#fafafa 0%,#f0f0f3 100%);
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+}
+.gate.hidden{display:none!important;}
+.gate-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:36px 32px 28px;
+  width:100%;max-width:380px;
+  box-shadow:0 20px 60px rgba(16,24,40,.10),0 8px 20px rgba(16,24,40,.05);
+  text-align:center;
+}
+.gate-icon{
+  width:48px;height:48px;border-radius:14px;
+  background:linear-gradient(135deg,#0a0a0a,#2d2d35);
+  margin:0 auto 18px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;color:#fff;
+}
+.gate-title{
+  font-size:1.05rem;font-weight:600;color:var(--text);
+  margin-bottom:6px;letter-spacing:-.01em;
+}
+.gate-sub{
+  font-size:.78rem;color:var(--muted);
+  margin-bottom:24px;line-height:1.5;
+}
+.gate-input{
+  width:100%;
+  background:var(--surface-2);
+  border:1px solid transparent;
+  border-radius:10px;
+  padding:11px 14px;
+  font-size:.9rem;font-family:inherit;color:var(--text);
+  outline:none;transition:all .15s;
+  text-align:center;letter-spacing:.05em;
+}
+.gate-input:focus{background:var(--surface);border-color:var(--border-strong);box-shadow:0 0 0 3px var(--accent-soft);}
+.gate-input.err{border-color:var(--red);box-shadow:0 0 0 3px var(--red-soft);animation:shake .35s;}
+@keyframes shake{
+  0%,100%{transform:translateX(0);}
+  20%,60%{transform:translateX(-5px);}
+  40%,80%{transform:translateX(5px);}
+}
+.gate-btn{
+  width:100%;margin-top:10px;
+  background:#0a0a0a;color:#fff;
+  border:none;border-radius:10px;
+  padding:11px;font-size:.85rem;font-weight:600;
+  cursor:pointer;transition:opacity .15s;font-family:inherit;
+}
+.gate-btn:hover{opacity:.85;}
+.gate-err{
+  font-size:.72rem;color:var(--red);
+  margin-top:10px;min-height:14px;
+}
+.gate-foot{
+  margin-top:22px;font-size:.66rem;color:var(--muted);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.gate-lang{display:flex;gap:6px;}
+.gate-lang button{
+  background:none;border:none;cursor:pointer;
+  font-size:.7rem;color:var(--muted);font-family:inherit;
+  padding:2px 8px;border-radius:6px;transition:all .15s;
+}
+.gate-lang button.active{color:var(--text);background:var(--surface-2);font-weight:600;}
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <div class="gate-icon">🔒</div>
+    <div class="gate-title" id="gateTitle">Access Required</div>
+    <div class="gate-sub" id="gateSub">This dashboard is private. Enter the access code to continue.</div>
+    <form onsubmit="event.preventDefault();checkPwd();">
+      <input type="password" class="gate-input" id="gatePwd" autocomplete="off" autofocus inputmode="numeric">
+      <button type="submit" class="gate-btn" id="gateBtn">Unlock</button>
+    </form>
+    <div class="gate-err" id="gateErr"></div>
+    <div class="gate-foot">
+      <span id="gateBrand">🌍 Economic Dashboard</span>
+      <div class="gate-lang">
+        <button id="gateEN" class="active" onclick="setGateLang('en')">EN</button>
+        <button id="gateAR" onclick="setGateLang('ar')">ع</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+<div class="top">
+  <div class="hdr">
+    <h1><span class="dot"></span><span data-i18n="title">Global Economic Dashboard</span></h1>
+    <div class="badges">
+      <span class="badge live" data-i18n="badgeLive">Live FX · 48h cache</span>
+      <span class="badge" data-i18n="badgeData">Data: IMF WEO Apr 2025</span>
+      <span class="badge" id="fxBadge" data-i18n="badgeFx">Loading live FX…</span>
+    </div>
+  </div>
+  <div class="sources">
+    <span class="lbl" data-i18n="sourcesLabel">Official sources:</span>
+    <span class="src" data-i18n="srcStats">🏛️ National statistics offices</span>
+    <span class="src" data-i18n="srcIMF">📊 IMF WEO April 2025</span>
+    <span class="src" data-i18n="srcILO">🏢 ILO ILOSTAT 2024</span>
+    <span class="src" data-i18n="srcCB">🏦 Central banks</span>
+    <span class="src" data-i18n="srcTip">💡 Hover any cell for source link</span>
+  </div>
+  <div class="toolbar">
+    <div class="search">
+      <span class="icon">🔍</span>
+      <input type="text" id="si" data-i18n-ph="searchPh" placeholder="Search country…" oninput="ft()">
+    </div>
+    <div class="count"><span data-i18n="showing">Showing</span> <b id="cs">0</b> / <b id="ct">0</b> <span data-i18n="countries">countries</span></div>
+    <div class="legend">
+      <div class="lg"><div class="d" style="background:var(--green)"></div><span data-i18n="top10">Top 10%</span></div>
+      <div class="lg"><div class="d" style="background:var(--amber)"></div><span data-i18n="top50">Top 50%</span></div>
+      <div class="lg"><div class="d" style="background:var(--red)"></div><span data-i18n="bot50">Bottom 50%</span></div>
+    </div>
+    <div class="spacer"></div>
+    <div class="toggles">
+      <div class="seg" role="group" aria-label="Language">
+        <button id="btnEN" class="active" onclick="setLang('en')">EN</button>
+        <button id="btnAR" onclick="setLang('ar')">ع</button>
+      </div>
+      <div class="seg" role="group" aria-label="Currency">
+        <button id="btnUSD" class="active" onclick="setCcy('USD')">$ USD</button>
+        <button id="btnQAR" onclick="setCcy('QAR')">﷼ QAR</button>
+      </div>
+      <button class="btn-ghost" onclick="refreshFX()"><span>🔄</span><span data-i18n="refresh">Refresh FX</span></button>
+    </div>
+  </div>
+</div>
+<div class="scroll">
+<div class="tw">
+<table id="dt">
+<thead><tr>
+  <th onclick="st(0)"><span data-i18n="colCountry">Country</span><small data-i18n="colCountrySub">ISO3 · Local currency</small></th>
+  <th onclick="st(1)"><span data-i18n="colMwLocal">Min wage</span><br><small data-i18n="colMwLocalSub">Local / month</small></th>
+  <th onclick="st(2)" id="hMW"><span data-i18n="colMwUSD">Min wage</span><br><small id="hMWu">USD / month</small></th>
+  <th onclick="st(3)"><span data-i18n="colInfl">Inflation</span><br><small data-i18n="colInflSub">CPI % annual</small></th>
+  <th onclick="st(4)"><span data-i18n="colIntr">Interest rate</span><br><small data-i18n="colIntrSub">Policy / lending %</small></th>
+  <th onclick="st(5)"><span data-i18n="colUnemp">Unemployment</span><br><small data-i18n="colUnempSub">% labour force</small></th>
+  <th onclick="st(6)" id="hAW"><span data-i18n="colAvgW">Avg salary</span><br><small id="hAWu">USD / month</small></th>
+  <th onclick="st(7)" id="hGP"><span data-i18n="colGdpPc">GDP per capita</span><br><small id="hGPu">USD</small></th>
+  <th onclick="st(8)" id="hNG"><span data-i18n="colNomGDP">Nominal GDP</span><br><small id="hNGu">Total USD</small></th>
+  <th onclick="st(9)"><span data-i18n="colFx">Exchange rate</span><br><small data-i18n="colFxSub">Local per 1 USD</small></th>
+</tr></thead>
+<tbody id="tb"></tbody>
+</table>
+</div>
+<footer>
+  <span data-i18n="footerData">Data:</span>
+  <a href="https://www.imf.org/external/datamapper" target="_blank" data-i18n="footerIMF">IMF WEO April 2025</a> ·
+  <a href="https://ilostat.ilo.org" target="_blank" data-i18n="footerILO">ILO ILOSTAT 2024</a> ·
+  <a href="https://data.worldbank.org" target="_blank" data-i18n="footerWB">World Bank</a> ·
+  <a href="https://open.er-api.com" target="_blank">Open Exchange Rates</a>
+  <br>
+  <span data-i18n="footerNote">National statistics offices and central banks per country · N/A = data not officially published · Wages shown per month</span>
+</footer>
+</div>
+</div>
+
+<div class="tip-box" id="tipBox" onmouseenter="cancelHide()" onmouseleave="scheduleHide()">
+  <div class="tip-title" id="tipTitle"></div>
+  <div class="tip-yr" id="tipYr"></div>
+  <div class="tip-org" id="tipOrg"></div>
+  <div class="tip-click" id="tipClick"></div>
+  <div class="tip-note" id="tipNote"></div>
+</div>
+<div class="notif" id="nt"></div>
+
+<script>
+
+/* ── password gate (SHA-256, client-side; deters casual access) ── */
+const PWD_HASH = 'a320480f534776bddb5cdb54b1e93d210a3c7d199e80a23c1b2178497b184c76';
+const PWD_KEY  = 'gd_auth_v1';
+const GATE_STR = {
+  en: { title:'Access Required', sub:'This dashboard is private. Enter the access code to continue.', btn:'Unlock', err:'Wrong code. Try again.', brand:'🌍 Economic Dashboard' },
+  ar: { title:'الوصول محمي', sub:'هذه اللوحة خاصّة. أدخل رمز الوصول للمتابعة.', btn:'فتح', err:'رمز غير صحيح. حاول مرّة أخرى.', brand:'🌍 لوحة المعلومات الاقتصادية' }
+};
+let gateLang = (navigator.language||'en').toLowerCase().startsWith('ar') ? 'ar' : 'en';
+
+async function sha256Hex(s){
+  const buf = new TextEncoder().encode(s);
+  const h = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function setGateLang(l){
+  gateLang = l;
+  const s = GATE_STR[l];
+  document.getElementById('gateTitle').textContent = s.title;
+  document.getElementById('gateSub').textContent = s.sub;
+  document.getElementById('gateBtn').textContent = s.btn;
+  document.getElementById('gateBrand').textContent = s.brand;
+  document.getElementById('gateEN').classList.toggle('active', l==='en');
+  document.getElementById('gateAR').classList.toggle('active', l==='ar');
+  const root = document.getElementById('htmlRoot');
+  root.setAttribute('dir', l==='ar' ? 'rtl' : 'ltr');
+  root.setAttribute('lang', l);
+}
+async function checkPwd(){
+  const inp = document.getElementById('gatePwd');
+  const v = inp.value;
+  if(!v) return;
+  const h = await sha256Hex(v);
+  if(h === PWD_HASH){
+    try{ localStorage.setItem(PWD_KEY, h); }catch{}
+    unlockGate();
+  } else {
+    inp.classList.add('err');
+    document.getElementById('gateErr').textContent = GATE_STR[gateLang].err;
+    setTimeout(()=>inp.classList.remove('err'), 400);
+    inp.select();
+  }
+}
+function unlockGate(){
+  document.getElementById('gate').classList.add('hidden');
+  // Use the gate's chosen language as the dashboard language too (if not yet set)
+  if(typeof setLang === 'function'){
+    setLang(gateLang);
+  }
+  loadData();
+}
+function tryAutoUnlock(){
+  setGateLang(gateLang);
+  try{
+    if(localStorage.getItem(PWD_KEY) === PWD_HASH){
+      unlockGate();
+      return true;
+    }
+  }catch{}
+  // focus the input
+  setTimeout(()=>document.getElementById('gatePwd')?.focus(), 50);
+  return false;
+}
+
+let DATA = [], SRCS = {}, CSRCS = {};
+
+const COUNTRY_AR = {"AFG": "أفغانستان", "ALB": "ألبانيا", "DZA": "الجزائر", "AND": "أندورا", "AGO": "أنغولا", "ATG": "أنتيغوا وباربودا", "ARG": "الأرجنتين", "ARM": "أرمينيا", "AUS": "أستراليا", "AUT": "النمسا", "AZE": "أذربيجان", "BHS": "الباهاما", "BHR": "البحرين", "BGD": "بنغلاديش", "BRB": "بربادوس", "BLR": "بيلاروسيا", "BEL": "بلجيكا", "BLZ": "بليز", "BEN": "بنين", "BTN": "بوتان", "BOL": "بوليفيا", "BIH": "البوسنة والهرسك", "BWA": "بوتسوانا", "BRA": "البرازيل", "BRN": "بروناي", "BGR": "بلغاريا", "BFA": "بوركينا فاسو", "BDI": "بوروندي", "CPV": "الرأس الأخضر", "KHM": "كمبوديا", "CMR": "الكاميرون", "CAN": "كندا", "CAF": "جمهورية إفريقيا الوسطى", "TCD": "تشاد", "CHL": "تشيلي", "CHN": "الصين", "COL": "كولومبيا", "COM": "جزر القمر", "CRI": "كوستاريكا", "HRV": "كرواتيا", "CUB": "كوبا", "CYP": "قبرص", "CZE": "جمهورية التشيك", "COD": "جمهورية الكونغو الديمقراطية", "DNK": "الدنمارك", "DJI": "جيبوتي", "DMA": "دومينيكا", "DOM": "جمهورية الدومينيكان", "ECU": "الإكوادور", "EGY": "مصر", "SLV": "السلفادور", "GNQ": "غينيا الاستوائية", "ERI": "إريتريا", "EST": "إستونيا", "SWZ": "إسواتيني", "ETH": "إثيوبيا", "FJI": "فيجي", "FIN": "فنلندا", "FRA": "فرنسا", "GAB": "الغابون", "GMB": "غامبيا", "GEO": "جورجيا", "DEU": "ألمانيا", "GHA": "غانا", "GRC": "اليونان", "GRD": "غرينادا", "GTM": "غواتيمالا", "GIN": "غينيا", "GNB": "غينيا بيساو", "GUY": "غيانا", "HTI": "هايتي", "HND": "هندوراس", "HKG": "هونغ كونغ", "HUN": "المجر", "ISL": "آيسلندا", "IND": "الهند", "IDN": "إندونيسيا", "IRN": "إيران", "IRQ": "العراق", "IRL": "أيرلندا", "ISR": "إسرائيل", "ITA": "إيطاليا", "CIV": "ساحل العاج", "JAM": "جامايكا", "JPN": "اليابان", "JOR": "الأردن", "KAZ": "كازاخستان", "KEN": "كينيا", "KIR": "كيريباتي", "XKX": "كوسوفو", "KWT": "الكويت", "KGZ": "قيرغيزستان", "LAO": "لاوس", "LVA": "لاتفيا", "LBN": "لبنان", "LSO": "ليسوتو", "LBR": "ليبيريا", "LBY": "ليبيا", "LIE": "ليختنشتاين", "LTU": "ليتوانيا", "LUX": "لوكسمبورغ", "MAC": "ماكاو", "MDG": "مدغشقر", "MWI": "مالاوي", "MYS": "ماليزيا", "MDV": "جزر المالديف", "MLI": "مالي", "MLT": "مالطا", "MHL": "جزر مارشال", "MUS": "موريشيوس", "MEX": "المكسيك", "FSM": "ميكرونيزيا", "MDA": "مولدوفا", "MCO": "موناكو", "MNG": "منغوليا", "MNE": "الجبل الأسود", "MAR": "المغرب", "MOZ": "موزمبيق", "MMR": "ميانمار", "NAM": "ناميبيا", "NRU": "ناورو", "NPL": "نيبال", "NLD": "هولندا", "NZL": "نيوزيلندا", "NIC": "نيكاراغوا", "NER": "النيجر", "NGA": "نيجيريا", "PRK": "كوريا الشمالية", "MKD": "مقدونيا الشمالية", "NOR": "النرويج", "OMN": "عُمان", "PAK": "باكستان", "PLW": "بالاو", "PSE": "فلسطين", "PAN": "بنما", "PNG": "بابوا غينيا الجديدة", "PRY": "باراغواي", "PER": "بيرو", "PHL": "الفلبين", "POL": "بولندا", "PRT": "البرتغال", "QAT": "قطر", "COG": "جمهورية الكونغو", "ROU": "رومانيا", "RUS": "روسيا", "RWA": "رواندا", "KNA": "سانت كيتس ونيفيس", "LCA": "سانت لوسيا", "VCT": "سانت فنسنت والغرينادين", "WSM": "ساموا", "SMR": "سان مارينو", "STP": "ساو تومي وبرينسيبي", "SAU": "المملكة العربية السعودية", "SEN": "السنغال", "SRB": "صربيا", "SYC": "سيشل", "SLE": "سيراليون", "SGP": "سنغافورة", "SVK": "سلوفاكيا", "SVN": "سلوفينيا", "SLB": "جزر سليمان", "SOM": "الصومال", "ZAF": "جنوب إفريقيا", "KOR": "كوريا الجنوبية", "SSD": "جنوب السودان", "ESP": "إسبانيا", "LKA": "سريلانكا", "SDN": "السودان", "SUR": "سورينام", "SWE": "السويد", "CHE": "سويسرا", "SYR": "سوريا", "TWN": "تايوان", "TJK": "طاجيكستان", "TZA": "تنزانيا", "THA": "تايلاند", "TLS": "تيمور الشرقية", "TGO": "توغو", "TON": "تونغا", "TTO": "ترينيداد وتوباغو", "TUN": "تونس", "TUR": "تركيا", "TKM": "تركمانستان", "TUV": "توفالو", "UGA": "أوغندا", "UKR": "أوكرانيا", "ARE": "الإمارات العربية المتحدة", "GBR": "المملكة المتحدة", "USA": "الولايات المتحدة", "URY": "الأوروغواي", "UZB": "أوزبكستان", "VUT": "فانواتو", "VEN": "فنزويلا", "VNM": "فيتنام", "YEM": "اليمن", "ZMB": "زامبيا", "ZWE": "زيمبابوي"};
+
+const QAR_RATE = 3.64;
+let lang = 'en';
+let ccy = 'USD';
+let liveRates = {};
+
+const STR = {
+  en: {
+    title: "Global Economic Dashboard",
+    badgeLive: "🟢 Live FX · 48h cache",
+    badgeData: "📅 Data: IMF WEO Apr 2025",
+    badgeFx: "💱 Loading live FX…",
+    sourcesLabel: "Official sources:",
+    srcStats: "🏛️ National statistics offices",
+    srcIMF: "📊 IMF WEO April 2025",
+    srcILO: "🏢 ILO ILOSTAT 2024",
+    srcCB: "🏦 Central banks",
+    srcTip: "💡 Hover any cell for source link",
+    searchPh: "Search country…",
+    showing: "Showing", countries: "countries",
+    top10: "Top 10%", top50: "Top 50%", bot50: "Bottom 50%",
+    refresh: "Refresh FX",
+    colCountry: "Country", colCountrySub: "ISO3 · Local currency",
+    colMwLocal: "Min wage", colMwLocalSub: "Local / month",
+    colMwUSD: "Min wage",
+    colInfl: "Inflation", colInflSub: "CPI % annual",
+    colIntr: "Interest rate", colIntrSub: "Policy / lending %",
+    colUnemp: "Unemployment", colUnempSub: "% labour force",
+    colAvgW: "Avg salary",
+    colGdpPc: "GDP per capita",
+    colNomGDP: "Nominal GDP",
+    colFx: "Exchange rate", colFxSub: "Local per 1 USD",
+    footerData: "Data:",
+    footerIMF: "IMF WEO April 2025",
+    footerILO: "ILO ILOSTAT 2024",
+    footerWB: "World Bank",
+    footerNote: "National statistics offices and central banks per country · N/A = data not officially published · Wages shown per month",
+    unitUSDmo: "USD / month", unitQARmo: "QAR / month",
+    unitUSD: "USD", unitQAR: "QAR",
+    unitTotalUSD: "Total USD", unitTotalQAR: "Total QAR",
+    rankOf: "of",
+    lblMwLocal: "Min wage (local/mo)",
+    lblMwUSD: "Min wage (USD/mo)",
+    lblInfl: "Inflation rate",
+    lblIntr: "Interest rate",
+    lblUnemp: "Unemployment rate",
+    lblAvgW: "Avg salary (USD/mo)",
+    lblGdpPc: "GDP per capita",
+    lblNomGDP: "Nominal GDP",
+    lblFx: "Exchange rate",
+    tipYear: "Data year:",
+    tipStats: "Statistics office",
+    tipLabor: "Labor ministry",
+    tipCB: "Central bank",
+    tipIntlRef: "Intl. ref:",
+    tipClick: "← click link to open official source",
+    fxLoaded: "💱 Live exchange rates loaded",
+    fxLive: "💱 FX rates live",
+    fxOffline: "💱 Embedded FX (offline)",
+    fxFetching: "⏳ Fetching…"
+  },
+  ar: {
+    title: "لوحة المعلومات الاقتصادية العالمية",
+    badgeLive: "🟢 أسعار صرف حيّة · تخزين 48 ساعة",
+    badgeData: "📅 البيانات: صندوق النقد الدولي، أبريل 2025",
+    badgeFx: "💱 جارٍ تحميل أسعار الصرف…",
+    sourcesLabel: "المصادر الرسمية:",
+    srcStats: "🏛️ مكاتب الإحصاء الوطنية",
+    srcIMF: "📊 آفاق الاقتصاد العالمي، أبريل 2025",
+    srcILO: "🏢 منظمة العمل الدولية ILOSTAT 2024",
+    srcCB: "🏦 البنوك المركزية",
+    srcTip: "💡 مرّر المؤشر على أي خلية لرؤية المصدر",
+    searchPh: "ابحث عن دولة…",
+    showing: "عرض", countries: "دولة",
+    top10: "أعلى 10٪", top50: "أعلى 50٪", bot50: "أدنى 50٪",
+    refresh: "تحديث الأسعار",
+    colCountry: "الدولة", colCountrySub: "رمز الأيزو · العملة المحلية",
+    colMwLocal: "الحد الأدنى للأجور", colMwLocalSub: "محلي / شهريًا",
+    colMwUSD: "الحد الأدنى للأجور",
+    colInfl: "التضخم", colInflSub: "مؤشر أسعار المستهلك ٪ سنوي",
+    colIntr: "سعر الفائدة", colIntrSub: "السياسة / الإقراض ٪",
+    colUnemp: "البطالة", colUnempSub: "٪ من القوى العاملة",
+    colAvgW: "متوسط الراتب",
+    colGdpPc: "الناتج المحلي للفرد",
+    colNomGDP: "الناتج المحلي الإجمالي",
+    colFx: "سعر الصرف", colFxSub: "محلي مقابل 1 دولار",
+    footerData: "البيانات:",
+    footerIMF: "صندوق النقد الدولي، أبريل 2025",
+    footerILO: "منظمة العمل الدولية ILOSTAT 2024",
+    footerWB: "البنك الدولي",
+    footerNote: "مكاتب الإحصاء الوطنية والبنوك المركزية لكل دولة · غير متوفر = بيانات غير منشورة رسميًا · الأجور معروضة شهريًا",
+    unitUSDmo: "دولار / شهريًا", unitQARmo: "ريال / شهريًا",
+    unitUSD: "دولار", unitQAR: "ريال",
+    unitTotalUSD: "إجمالي بالدولار", unitTotalQAR: "إجمالي بالريال",
+    rankOf: "من",
+    lblMwLocal: "الحد الأدنى للأجور (محلي/شهريًا)",
+    lblMwUSD: "الحد الأدنى للأجور (دولار/شهريًا)",
+    lblInfl: "معدل التضخم",
+    lblIntr: "سعر الفائدة",
+    lblUnemp: "معدل البطالة",
+    lblAvgW: "متوسط الراتب (دولار/شهريًا)",
+    lblGdpPc: "الناتج المحلي للفرد",
+    lblNomGDP: "الناتج المحلي الإجمالي",
+    lblFx: "سعر الصرف",
+    tipYear: "سنة البيانات:",
+    tipStats: "مكتب الإحصاء",
+    tipLabor: "وزارة العمل",
+    tipCB: "البنك المركزي",
+    tipIntlRef: "المرجع الدولي:",
+    tipClick: "← انقر الرابط لفتح المصدر الرسمي",
+    fxLoaded: "💱 تم تحميل أسعار الصرف الحيّة",
+    fxLive: "💱 أسعار الصرف حيّة",
+    fxOffline: "💱 أسعار ثابتة (دون اتصال)",
+    fxFetching: "⏳ جارٍ الجلب…"
+  }
+};
+
+// Map linking SRCS keys -> STR label keys, per language
+const SRC_LABEL = {
+  mwLocal:'lblMwLocal', mwUSD:'lblMwUSD', infl:'lblInfl', intr:'lblIntr',
+  unemp:'lblUnemp', avgW:'lblAvgW', gdpPc:'lblGdpPc', nomGDP:'lblNomGDP', fx:'lblFx'
+};
+
+function t(k){ return (STR[lang] && STR[lang][k]) || (STR.en[k]||k); }
+
+function flag(i2){
+  if(!i2||i2.length!==2)return'🌐';
+  return String.fromCodePoint(0x1F1E6+i2.charCodeAt(0)-65)+
+         String.fromCodePoint(0x1F1E6+i2.charCodeAt(1)-65);
+}
+
+function fv(v,d=2,p='',s=''){
+  if(v===null||v===undefined)return'<span class="na">N/A</span>';
+  const n=parseFloat(v);if(isNaN(n))return'<span class="na">N/A</span>';
+  if(Math.abs(n)>=1e12)return`${p}${(n/1e12).toFixed(2)}T${s}`;
+  if(Math.abs(n)>=1e9) return`${p}${(n/1e9).toFixed(2)}B${s}`;
+  if(Math.abs(n)>=1e6) return`${p}${(n/1e6).toFixed(2)}M${s}`;
+  return`${p}${n.toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d})}${s}`;
+}
+
+function fvCcy(v,d=2){
+  if(v===null||v===undefined)return'<span class="na">N/A</span>';
+  const n=parseFloat(v);if(isNaN(n))return'<span class="na">N/A</span>';
+  const val=ccy==='QAR'?n*QAR_RATE:n;
+  const sym=ccy==='QAR'?'﷼':'$';
+  if(Math.abs(val)>=1e12)return`${sym}${(val/1e12).toFixed(2)}T`;
+  if(Math.abs(val)>=1e9) return`${sym}${(val/1e9).toFixed(2)}B`;
+  if(Math.abs(val)>=1e6) return`${sym}${(val/1e6).toFixed(2)}M`;
+  return`${sym}${val.toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d})}`;
+}
+
+function rb(rk,tot){
+  if(!rk)return'';
+  const p=rk/tot,cl=p<=.1?'t':p<=.5?'m':'b';
+  return`<span class="rk ${cl}">#${rk} ${t('rankOf')} ${tot}</span>`;
+}
+
+function mc(val,rk,tot,srcKey,iso3,extraClass=''){
+  const vHtml=fv(val)+(rk?` ${rb(rk,tot)}`:'');
+  return`<td class="mc ${extraClass}" onmouseenter="showTip(event,'${srcKey}','${iso3}')" onmouseleave="scheduleHide()"><span class="v">${vHtml}</span></td>`;
+}
+function mcCcy(val,rk,tot,srcKey,iso3){
+  const vHtml=fvCcy(val)+(rk?` ${rb(rk,tot)}`:'');
+  return`<td class="mc" onmouseenter="showTip(event,'${srcKey}','${iso3}')" onmouseleave="scheduleHide()"><span class="v">${vHtml}</span></td>`;
+}
+
+function countryName(c){
+  if(lang==='ar' && COUNTRY_AR[c.iso3]) return COUNTRY_AR[c.iso3];
+  return c.name;
+}
+
+function buildRow(c){
+  const f=flag(c.iso2);
+  const liveFx=liveRates[c.ccy]||null;
+  const fxVal=liveFx||c.fx;
+  let mwLoc=c.mwLocal;
+  if(c.mwUSD&&liveFx) mwLoc=+(c.mwUSD*liveFx).toFixed(2);
+  const mwLocStr=mwLoc!==null?`${fv(mwLoc,2)} ${c.ccy}`:'<span class="na">N/A</span>';
+  const fxDisplay=fxVal!==null?`${fv(fxVal,fxVal<1?4:2)} ${c.ccy}`:'<span class="na">N/A</span>';
+  const iso3=c.iso3;
+  const name=countryName(c);
+  return`<tr
+    data-n="${name.toLowerCase()}" data-en="${c.name.toLowerCase()}"
+    data-g="${c.gdpPc||''}" data-ng="${c.nomGDP||''}"
+    data-i="${c.infl||''}" data-r="${c.intr||''}"
+    data-u="${c.unemp||''}" data-m="${c.mwUSD||''}" data-a="${c.avgW||''}">
+    <td class="cc"><span class="fl">${f}</span> <span class="cn">${name}</span><br><span class="ci">${iso3} · ${c.ccy}</span></td>
+    <td class="mc" onmouseenter="showTip(event,'mwLocal','${iso3}')" onmouseleave="scheduleHide()"><span class="v">${mwLocStr}</span></td>
+    ${mcCcy(c.mwUSD,c.mwUSDRk,c.mwUSDTot,'mwUSD',iso3)}
+    ${mc(c.infl,c.inflRk,c.inflTot,'infl',iso3)}
+    ${mc(c.intr,c.intrRk,c.intrTot,'intr',iso3)}
+    ${mc(c.unemp,c.unempRk,c.unempTot,'unemp',iso3)}
+    ${mcCcy(c.avgW,c.avgWRk,c.avgWTot,'avgW',iso3)}
+    ${mcCcy(c.gdpPc,c.gdpPcRk,c.gdpPcTot,'gdpPc',iso3)}
+    ${mcCcy(c.nomGDP,c.nomGDPRk,c.nomGDPTot,'nomGDP',iso3)}
+    <td class="mc" onmouseenter="showTip(event,'fx','${iso3}')" onmouseleave="scheduleHide()"><span class="v">${fxDisplay}</span></td>
+  </tr>`;
+}
+
+function render(){
+  const tb=document.getElementById('tb');
+  tb.innerHTML=DATA.map(buildRow).join('');
+  document.getElementById('cs').textContent=DATA.length;
+  document.getElementById('ct').textContent=DATA.length;
+}
+
+function applyI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.getAttribute('data-i18n');
+    el.textContent=t(k);
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{
+    const k=el.getAttribute('data-i18n-ph');
+    el.setAttribute('placeholder', t(k));
+  });
+  // Currency unit labels reflect current ccy + lang
+  const u=(ccy==='QAR'?t('unitQARmo'):t('unitUSDmo'));
+  document.getElementById('hMWu').textContent=u;
+  document.getElementById('hAWu').textContent=u;
+  document.getElementById('hGPu').textContent=(ccy==='QAR'?t('unitQAR'):t('unitUSD'));
+  document.getElementById('hNGu').textContent=(ccy==='QAR'?t('unitTotalQAR'):t('unitTotalUSD'));
+}
+
+function setLang(l){
+  lang=l;
+  document.getElementById('btnEN').classList.toggle('active',l==='en');
+  document.getElementById('btnAR').classList.toggle('active',l==='ar');
+  const root=document.getElementById('htmlRoot');
+  root.setAttribute('lang', l);
+  root.setAttribute('dir', l==='ar'?'rtl':'ltr');
+  document.title = t('title');
+  applyI18n();
+  render();ft();
+}
+
+function setCcy(c){
+  ccy=c;
+  document.getElementById('btnUSD').classList.toggle('active',c==='USD');
+  document.getElementById('btnQAR').classList.toggle('active',c==='QAR');
+  applyI18n();
+  render();ft();
+}
+
+let sc=-1,sd=1;
+const ATTRS=[null,'m','m','i','r','u','a','g','ng',null];
+function st(col){
+  const ths=document.querySelectorAll('thead th');
+  sd=sc===col?-sd:1;sc=col;
+  ths.forEach(th=>th.classList.remove('sa','sd'));
+  ths[col]?.classList.add(sd===1?'sd':'sa');
+  const rows=Array.from(document.querySelectorAll('#tb tr'));
+  rows.sort((a,b)=>{
+    if(col===0)return sd*a.dataset.n.localeCompare(b.dataset.n, lang);
+    const at=ATTRS[col];if(!at)return 0;
+    const av=parseFloat(a.dataset[at])||(sd>0?-Infinity:Infinity);
+    const bv=parseFloat(b.dataset[at])||(sd>0?-Infinity:Infinity);
+    return sd*(bv-av);
+  });
+  document.getElementById('tb').append(...rows);
+}
+
+function ft(){
+  const q=document.getElementById('si').value.toLowerCase();
+  const rows=document.querySelectorAll('#tb tr');
+  let shown=0;
+  rows.forEach(r=>{
+    const m=!q||r.dataset.n.includes(q)||r.dataset.en.includes(q);
+    r.classList.toggle('hidden',!m);if(m)shown++;
+  });
+  document.getElementById('cs').textContent=shown;
+}
+
+/* Tooltip with per-country official sources */
+let _hideTimer=null;
+
+function showTip(e, sk, iso3){
+  cancelHide();
+  const gs = SRCS[sk]||{};
+  const cs = CSRCS[iso3]||{};
+  const box = document.getElementById('tipBox');
+
+  let orgName='', orgUrl='', orgLabel='';
+  if(['gdpPc','nomGDP','infl','unemp','avgW'].includes(sk)){
+    orgName=cs.statsOffice||''; orgUrl=cs.statsUrl||''; orgLabel=t('tipStats');
+  } else if(sk==='mwUSD'||sk==='mwLocal'){
+    orgName=cs.laborMinistry||''; orgUrl=cs.laborUrl||''; orgLabel=t('tipLabor');
+  } else if(sk==='intr'||sk==='fx'){
+    orgName=cs.centralBank||''; orgUrl=cs.cbUrl||''; orgLabel=t('tipCB');
+  }
+
+  const titleKey = SRC_LABEL[sk];
+  document.getElementById('tipTitle').textContent=titleKey?t(titleKey):(gs.label||sk);
+  document.getElementById('tipYr').textContent='📅 '+t('tipYear')+' '+(gs.year||'2025');
+
+  let orgHtml='';
+  if(orgName && orgUrl){
+    orgHtml=`<b>${orgLabel}</b><br>`
+           +`🏛️ <a href="${orgUrl}" target="_blank" rel="noopener">${orgName}</a>`;
+    if(gs.src) orgHtml+=`<br><span style="opacity:.7;font-size:.66rem;margin-top:4px;display:block">📊 ${t('tipIntlRef')} ${gs.src}</span>`;
+  } else if(orgName){
+    orgHtml=`🏛️ ${orgName}`;
+  } else {
+    orgHtml=gs.src?`📊 ${gs.src}`:'';
+  }
+  document.getElementById('tipOrg').innerHTML=orgHtml;
+  document.getElementById('tipClick').textContent=orgUrl?t('tipClick'):'';
+  document.getElementById('tipNote').textContent=gs.note||'';
+
+  box.style.display='block';
+  const bw=box.offsetWidth||320, bh=box.offsetHeight||140;
+  let x=e.clientX+16, y=e.clientY+16;
+  if(x+bw>window.innerWidth-12) x=e.clientX-bw-12;
+  if(y+bh>window.innerHeight-12) y=e.clientY-bh-12;
+  box.style.left=x+'px'; box.style.top=y+'px';
+}
+
+function scheduleHide(){
+  cancelHide();
+  _hideTimer=setTimeout(()=>{document.getElementById('tipBox').style.display='none';},280);
+}
+function cancelHide(){if(_hideTimer){clearTimeout(_hideTimer);_hideTimer=null;}}
+function hideTip(){document.getElementById('tipBox').style.display='none';}
+
+function notif(msg,ms=4000){
+  const el=document.getElementById('nt');
+  el.textContent=msg;el.style.display='block';
+  clearTimeout(el._t);el._t=setTimeout(()=>el.style.display='none',ms);
+}
+
+const FX_KEY='fx_econ_v3',FX_MS=48*60*60*1000;
+async function fetchLiveFX(force=false){
+  if(!force){
+    try{
+      const r=localStorage.getItem(FX_KEY);
+      if(r){const{rates,ts}=JSON.parse(r);if(Date.now()-ts<FX_MS){liveRates=rates;render();ft();setBadge('ok');return;}}
+    }catch{}
+  }
+  try{
+    const resp=await fetch('https://open.er-api.com/v6/latest/USD');
+    const d=await resp.json();
+    liveRates=d.rates||{};
+    try{localStorage.setItem(FX_KEY,JSON.stringify({rates:liveRates,ts:Date.now()}));}catch{}
+    render();ft();setBadge('ok');
+    notif(t('fxLoaded'));
+  }catch{setBadge('offline');}
+}
+function setBadge(state){
+  const el=document.getElementById('fxBadge');
+  el.removeAttribute('data-i18n'); // we're setting it manually now
+  if(state==='ok'){el.textContent=t('fxLive');el.style.color='var(--green)';el.style.borderColor='#bbf7d0';el.style.background='var(--green-soft)';}
+  else{el.textContent=t('fxOffline');el.style.color='var(--muted)';}
+}
+function refreshFX(){
+  const el=document.getElementById('fxBadge');
+  el.removeAttribute('data-i18n');
+  el.textContent=t('fxFetching');
+  fetchLiveFX(true);
+}
+
+// initial
+async function loadData(){
+  try{
+    const resp = await fetch('./dashboard_data.json?v='+Date.now(), {cache:'no-store'});
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    const d = await resp.json();
+    DATA = d.DATA || [];
+    SRCS = d.SRCS || {};
+    CSRCS = d.CSRCS || {};
+    applyI18n();
+    render(); ft(); fetchLiveFX();
+  }catch(e){
+    console.error('Data load failed:', e);
+    const tb = document.getElementById('tb');
+    tb.innerHTML = '<tr><td colspan="10" style="padding:40px;text-align:center;color:var(--muted);font-size:.85rem">'
+      +'⚠️ '+(lang==='ar'?'تعذّر تحميل البيانات. تأكد من إتاحة ملف dashboard_data.json بجانب هذا الملف (يتطلب استضافته على خادم ويب).':'Could not load data. Ensure dashboard_data.json is served alongside this file (web hosting required).')
+      +'</td></tr>';
+    applyI18n();
+  }
+}
+
+// Initial: try to auto-unlock from localStorage; otherwise wait for password.
+tryAutoUnlock();
+</script>
+</body>
+</html>
