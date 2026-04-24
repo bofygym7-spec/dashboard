@@ -333,6 +333,7 @@ td.mc .v{unicode-bidi:plaintext;}
     <div class="badges">
       <span class="badge live" data-i18n="badgeLive">Live FX · 48h cache</span>
       <span class="badge" data-i18n="badgeData">Data: IMF WEO Apr 2025</span>
+      <span class="badge" id="updBadge"></span>
       <span class="badge" id="fxBadge" data-i18n="badgeFx">Loading live FX…</span>
     </div>
   </div>
@@ -473,7 +474,7 @@ function tryAutoUnlock(){
   return false;
 }
 
-let DATA = [], SRCS = {}, CSRCS = {};
+let DATA = [], SRCS = {}, CSRCS = {}, META = {};
 
 const COUNTRY_AR = {"AFG": "أفغانستان", "ALB": "ألبانيا", "DZA": "الجزائر", "AND": "أندورا", "AGO": "أنغولا", "ATG": "أنتيغوا وباربودا", "ARG": "الأرجنتين", "ARM": "أرمينيا", "AUS": "أستراليا", "AUT": "النمسا", "AZE": "أذربيجان", "BHS": "الباهاما", "BHR": "البحرين", "BGD": "بنغلاديش", "BRB": "بربادوس", "BLR": "بيلاروسيا", "BEL": "بلجيكا", "BLZ": "بليز", "BEN": "بنين", "BTN": "بوتان", "BOL": "بوليفيا", "BIH": "البوسنة والهرسك", "BWA": "بوتسوانا", "BRA": "البرازيل", "BRN": "بروناي", "BGR": "بلغاريا", "BFA": "بوركينا فاسو", "BDI": "بوروندي", "CPV": "الرأس الأخضر", "KHM": "كمبوديا", "CMR": "الكاميرون", "CAN": "كندا", "CAF": "جمهورية إفريقيا الوسطى", "TCD": "تشاد", "CHL": "تشيلي", "CHN": "الصين", "COL": "كولومبيا", "COM": "جزر القمر", "CRI": "كوستاريكا", "HRV": "كرواتيا", "CUB": "كوبا", "CYP": "قبرص", "CZE": "جمهورية التشيك", "COD": "جمهورية الكونغو الديمقراطية", "DNK": "الدنمارك", "DJI": "جيبوتي", "DMA": "دومينيكا", "DOM": "جمهورية الدومينيكان", "ECU": "الإكوادور", "EGY": "مصر", "SLV": "السلفادور", "GNQ": "غينيا الاستوائية", "ERI": "إريتريا", "EST": "إستونيا", "SWZ": "إسواتيني", "ETH": "إثيوبيا", "FJI": "فيجي", "FIN": "فنلندا", "FRA": "فرنسا", "GAB": "الغابون", "GMB": "غامبيا", "GEO": "جورجيا", "DEU": "ألمانيا", "GHA": "غانا", "GRC": "اليونان", "GRD": "غرينادا", "GTM": "غواتيمالا", "GIN": "غينيا", "GNB": "غينيا بيساو", "GUY": "غيانا", "HTI": "هايتي", "HND": "هندوراس", "HKG": "هونغ كونغ", "HUN": "المجر", "ISL": "آيسلندا", "IND": "الهند", "IDN": "إندونيسيا", "IRN": "إيران", "IRQ": "العراق", "IRL": "أيرلندا", "ISR": "إسرائيل", "ITA": "إيطاليا", "CIV": "ساحل العاج", "JAM": "جامايكا", "JPN": "اليابان", "JOR": "الأردن", "KAZ": "كازاخستان", "KEN": "كينيا", "KIR": "كيريباتي", "XKX": "كوسوفو", "KWT": "الكويت", "KGZ": "قيرغيزستان", "LAO": "لاوس", "LVA": "لاتفيا", "LBN": "لبنان", "LSO": "ليسوتو", "LBR": "ليبيريا", "LBY": "ليبيا", "LIE": "ليختنشتاين", "LTU": "ليتوانيا", "LUX": "لوكسمبورغ", "MAC": "ماكاو", "MDG": "مدغشقر", "MWI": "مالاوي", "MYS": "ماليزيا", "MDV": "جزر المالديف", "MLI": "مالي", "MLT": "مالطا", "MHL": "جزر مارشال", "MUS": "موريشيوس", "MEX": "المكسيك", "FSM": "ميكرونيزيا", "MDA": "مولدوفا", "MCO": "موناكو", "MNG": "منغوليا", "MNE": "الجبل الأسود", "MAR": "المغرب", "MOZ": "موزمبيق", "MMR": "ميانمار", "NAM": "ناميبيا", "NRU": "ناورو", "NPL": "نيبال", "NLD": "هولندا", "NZL": "نيوزيلندا", "NIC": "نيكاراغوا", "NER": "النيجر", "NGA": "نيجيريا", "PRK": "كوريا الشمالية", "MKD": "مقدونيا الشمالية", "NOR": "النرويج", "OMN": "عُمان", "PAK": "باكستان", "PLW": "بالاو", "PSE": "فلسطين", "PAN": "بنما", "PNG": "بابوا غينيا الجديدة", "PRY": "باراغواي", "PER": "بيرو", "PHL": "الفلبين", "POL": "بولندا", "PRT": "البرتغال", "QAT": "قطر", "COG": "جمهورية الكونغو", "ROU": "رومانيا", "RUS": "روسيا", "RWA": "رواندا", "KNA": "سانت كيتس ونيفيس", "LCA": "سانت لوسيا", "VCT": "سانت فنسنت والغرينادين", "WSM": "ساموا", "SMR": "سان مارينو", "STP": "ساو تومي وبرينسيبي", "SAU": "المملكة العربية السعودية", "SEN": "السنغال", "SRB": "صربيا", "SYC": "سيشل", "SLE": "سيراليون", "SGP": "سنغافورة", "SVK": "سلوفاكيا", "SVN": "سلوفينيا", "SLB": "جزر سليمان", "SOM": "الصومال", "ZAF": "جنوب إفريقيا", "KOR": "كوريا الجنوبية", "SSD": "جنوب السودان", "ESP": "إسبانيا", "LKA": "سريلانكا", "SDN": "السودان", "SUR": "سورينام", "SWE": "السويد", "CHE": "سويسرا", "SYR": "سوريا", "TWN": "تايوان", "TJK": "طاجيكستان", "TZA": "تنزانيا", "THA": "تايلاند", "TLS": "تيمور الشرقية", "TGO": "توغو", "TON": "تونغا", "TTO": "ترينيداد وتوباغو", "TUN": "تونس", "TUR": "تركيا", "TKM": "تركمانستان", "TUV": "توفالو", "UGA": "أوغندا", "UKR": "أوكرانيا", "ARE": "الإمارات العربية المتحدة", "GBR": "المملكة المتحدة", "USA": "الولايات المتحدة", "URY": "الأوروغواي", "UZB": "أوزبكستان", "VUT": "فانواتو", "VEN": "فنزويلا", "VNM": "فيتنام", "YEM": "اليمن", "ZMB": "زامبيا", "ZWE": "زيمبابوي"};
 
@@ -535,7 +536,9 @@ const STR = {
     fxLoaded: "💱 Live exchange rates loaded",
     fxLive: "💱 FX rates live",
     fxOffline: "💱 Embedded FX (offline)",
-    fxFetching: "⏳ Fetching…"
+    fxFetching: "⏳ Fetching…",
+    updatedPrefix: "📅 Updated",
+    updatedUnknown: "📅 Updated —"
   },
   ar: {
     title: "لوحة المعلومات الاقتصادية العالمية",
@@ -589,7 +592,9 @@ const STR = {
     fxLoaded: "💱 تم تحميل أسعار الصرف الحيّة",
     fxLive: "💱 أسعار الصرف حيّة",
     fxOffline: "💱 أسعار ثابتة (دون اتصال)",
-    fxFetching: "⏳ جارٍ الجلب…"
+    fxFetching: "⏳ جارٍ الجلب…",
+    updatedPrefix: "📅 آخر تحديث",
+    updatedUnknown: "📅 آخر تحديث —"
   }
 };
 
@@ -697,6 +702,28 @@ function applyI18n(){
   document.getElementById('hAWu').textContent=u;
   document.getElementById('hGPu').textContent=(ccy==='QAR'?t('unitQAR'):t('unitUSD'));
   document.getElementById('hNGu').textContent=(ccy==='QAR'?t('unitTotalQAR'):t('unitTotalUSD'));
+  renderUpdated();
+}
+
+function renderUpdated(){
+  const el=document.getElementById('updBadge');
+  if(!el) return;
+  const iso = META && (META.last_updated || META.generated_at);
+  if(!iso){
+    el.textContent = t('updatedUnknown');
+    el.title = '';
+    return;
+  }
+  const d = new Date(iso);
+  if(isNaN(d.getTime())){
+    el.textContent = t('updatedPrefix') + ' ' + iso;
+    el.title = iso;
+    return;
+  }
+  const locale = lang==='ar' ? 'ar-EG' : 'en-US';
+  const dateStr = d.toLocaleDateString(locale, {year:'numeric', month:'short', day:'numeric'});
+  el.textContent = t('updatedPrefix') + ' ' + dateStr;
+  el.title = d.toLocaleString(locale);
 }
 
 function setLang(l){
@@ -844,6 +871,7 @@ async function loadData(){
     DATA = d.DATA || [];
     SRCS = d.SRCS || {};
     CSRCS = d.CSRCS || {};
+    META = d._meta || {};
     applyI18n();
     render(); ft(); fetchLiveFX();
   }catch(e){
