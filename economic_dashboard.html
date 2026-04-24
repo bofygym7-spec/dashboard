@@ -188,6 +188,15 @@ tbody td{
 .rk.t{background:var(--green-soft);color:var(--green);}
 .rk.m{background:var(--amber-soft);color:var(--amber);}
 .rk.b{background:var(--red-soft);color:var(--red);}
+.mwlbl{
+  display:inline-block;padding:1px 6px;border-radius:4px;
+  font-size:.58rem;font-weight:600;letter-spacing:.02em;
+  margin-inline-start:6px;background:var(--blue-soft);color:var(--blue);
+  white-space:nowrap;vertical-align:middle;
+}
+.mwlbl.none{background:var(--surface-2);color:var(--muted);}
+.mwlbl.cba{background:#f3e8ff;color:#7c3aed;}
+.mwlbl.cap{background:#ecfdf5;color:var(--green);}
 .mc{cursor:help;}
 .hidden{display:none!important;}
 .tip-box{
@@ -652,6 +661,16 @@ function countryName(c){
   return c.name;
 }
 
+function mwLabelHtml(lbl){
+  if(!lbl) return '';
+  const low = String(lbl).toLowerCase();
+  let cls = 'mwlbl';
+  if(low==='none') cls += ' none';
+  else if(low.startsWith('cba')) cls += ' cba';
+  else if(low.startsWith('capital') || low.startsWith('federal') || low.startsWith('general') || low.startsWith('national floor') || low.startsWith('emiratis') || low.startsWith('public')) cls += ' cap';
+  // 'National' and 'Federal' keep default blue tint
+  return ` <span class="${cls}" title="${lbl}">${lbl}</span>`;
+}
 function buildRow(c){
   const f=flag(c.iso2);
   const liveFx=liveRates[c.ccy]||null;
@@ -662,14 +681,16 @@ function buildRow(c){
   const fxDisplay=fxVal!==null?`${fv(fxVal,fxVal<1?4:2)} ${c.ccy}`:'<span class="na">N/A</span>';
   const iso3=c.iso3;
   const name=countryName(c);
+  const lbl = (c.mwLabel && c.mwLabel!=='National') ? mwLabelHtml(c.mwLabel) : '';
+  const mwUsdCell = `<td class="mc" onmouseenter="showTip(event,'mwUSD','${iso3}')" onmouseleave="scheduleHide()"><span class="v">${fvCcy(c.mwUSD)}${c.mwUSDRk?` ${rb(c.mwUSDRk,c.mwUSDTot)}`:''}${lbl}</span></td>`;
   return`<tr
     data-n="${name.toLowerCase()}" data-en="${c.name.toLowerCase()}"
     data-g="${c.gdpPc||''}" data-ng="${c.nomGDP||''}"
     data-i="${c.infl||''}" data-r="${c.intr||''}"
     data-u="${c.unemp||''}" data-m="${c.mwUSD||''}" data-a="${c.avgW||''}">
     <td class="cc"><span class="fl">${f}</span> <span class="cn">${name}</span><br><span class="ci">${iso3} · ${c.ccy}</span></td>
-    <td class="mc" onmouseenter="showTip(event,'mwLocal','${iso3}')" onmouseleave="scheduleHide()"><span class="v">${mwLocStr}</span></td>
-    ${mcCcy(c.mwUSD,c.mwUSDRk,c.mwUSDTot,'mwUSD',iso3)}
+    <td class="mc" onmouseenter="showTip(event,'mwLocal','${iso3}')" onmouseleave="scheduleHide()"><span class="v">${mwLocStr}${lbl}</span></td>
+    ${mwUsdCell}
     ${mc(c.infl,c.inflRk,c.inflTot,'infl',iso3)}
     ${mc(c.intr,c.intrRk,c.intrTot,'intr',iso3)}
     ${mc(c.unemp,c.unempRk,c.unempTot,'unemp',iso3)}
